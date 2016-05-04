@@ -12,7 +12,8 @@
         "Languages"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.sayHello",
+        "onLanguage:usql"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -30,7 +31,18 @@
             "language": "usql",
             "scopeName": "source.sql",
             "path": "./syntaxes/sql.tmLanguage"
-        }]
+        }],
+        "configuration": {
+			"type": "object",
+			"title": "Example configuration",
+			"properties": {
+				"languageServerExample.maxNumberOfProblems": {
+					"type": "number",
+					"default": 100,
+					"description": "Controls the maximum number of problems produced by the server."
+				}
+			}
+		}
     },
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
@@ -40,5 +52,8 @@
     "devDependencies": {
         "typescript": "^1.8.5",
         "vscode": "^0.11.0"
-    }
+    },
+    "dependencies": {
+		"vscode-languageclient": "^1.4.2"
+	}
 }
