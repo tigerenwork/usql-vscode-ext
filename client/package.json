@@ -1,59 +1,71 @@
 {
-    "name": "usql-vscode-ext",
-    "displayName": "USQL-Language-Support",
-    "description": "usql language support",
-    "version": "0.0.1",
-    "publisher": "Microsoft",
-    "engines": {
-        "vscode": "^1.0.0"
-    },
-    "categories": [
-        "Other",
-        "Languages"
+  "name": "usql-vscode-ext",
+  "displayName": "USQL-Language-Support",
+  "description": "usql language support",
+  "version": "0.0.1",
+  "publisher": "Microsoft",
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "categories": [
+    "Other",
+    "Languages"
+  ],
+  "activationEvents": [
+    "onCommand:extension.sayHello",
+    "onLanguage:usql"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.sayHello",
+        "title": "Hello World"
+      }
     ],
-    "activationEvents": [
-        "onCommand:extension.sayHello",
-        "onLanguage:usql"
+    "languages": [
+      {
+        "id": "usql",
+        "aliases": [
+          "USQL",
+          "usql"
+        ],
+        "extensions": [
+          ".usql"
+        ],
+        "configuration": "./usql.configuration.json"
+      }
     ],
-    "main": "./out/src/extension",
-    "contributes": {
-        "commands": [{
-            "command": "extension.sayHello",
-            "title": "Hello World"
-        }],
-        "languages": [{
-            "id": "usql",
-            "aliases": ["USQL", "usql"],
-            "extensions": [".usql"],
-            "configuration": "./usql.configuration.json"
-        }],
-        "grammars": [{
-            "language": "usql",
-            "scopeName": "source.sql",
-            "path": "./syntaxes/sql.tmLanguage"
-        }],
-        "configuration": {
-			"type": "object",
-			"title": "Example configuration",
-			"properties": {
-				"languageServerExample.maxNumberOfProblems": {
-					"type": "number",
-					"default": 100,
-					"description": "Controls the maximum number of problems produced by the server."
-				}
-			}
-		}
-    },
-    "scripts": {
-        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install"
-    },
-    "devDependencies": {
-        "typescript": "^1.8.5",
-        "vscode": "^0.11.0"
-    },
-    "dependencies": {
-		"vscode-languageclient": "^1.4.2"
-	}
+    "grammars": [
+      {
+        "language": "usql",
+        "scopeName": "source.sql",
+        "path": "./syntaxes/sql.tmLanguage"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Example configuration",
+      "properties": {
+        "languageServerExample.maxNumberOfProblems": {
+          "type": "number",
+          "default": 100,
+          "description": "Controls the maximum number of problems produced by the server."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "electron-prebuilt": "^1.0.0",
+    "typescript": "^1.8.5",
+    "vscode": "^0.11.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^1.4.2"
+  }
 }

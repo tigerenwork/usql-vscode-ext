@@ -3,9 +3,9 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import * as path from 'path';
-
 import { workspace, Disposable, ExtensionContext } from 'vscode';
 import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, TransportKind } from 'vscode-languageclient';
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -57,6 +57,28 @@ export function activate(context: vscode.ExtensionContext) {
 	// Push the disposable to the context's subscriptions so that the 
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);
+	
+	
+	// use electron-edge to load dll
+	var edge = require('electron-edge');
+	
+	let fun1 = edge.func({
+		assemblyFile:'C:\\Src\\ClassLibrary1\\ClassLibrary1\\bin\\Debug\\ClassLibrary1.dll',
+		typeName:'ClassLibrary1.Class1',
+		methodName:'GetStringAsync'
+	});
+	
+	console.log('start calling dll');
+	fun1('JavaScript',function (error,result) {
+		if (error) throw error;
+		console.log(result);
+		
+	});
+	
+	// helloWorld('JavaScript', function (error, result) {
+    // if (error) throw error;
+    // console.log(result);
+//});
 }
 
 // this method is called when your extension is deactivated
