@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// If the extension is launch in debug mode the debug server options are use
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { module: serverModule, transport: TransportKind.ipc },
+		run : { module: serverModule, transport: TransportKind.ipc},
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 	
@@ -60,20 +60,20 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	
 	// use electron-edge to load dll
-	var edge = require('electron-edge');
+	// var edge = require('electron-edge');
 	
-	let fun1 = edge.func({
-		assemblyFile:'C:\\Src\\ClassLibrary1\\ClassLibrary1\\bin\\Debug\\ClassLibrary1.dll',
-		typeName:'ClassLibrary1.Class1',
-		methodName:'GetStringAsync'
-	});
+	// let fun1 = edge.func({
+	// 	assemblyFile:'C:\\Src\\ClassLibrary1\\ClassLibrary1\\bin\\Debug\\ClassLibrary1.dll',
+	// 	typeName:'ClassLibrary1.Class1',
+	// 	methodName:'GetStringAsync'
+	// });
 	
-	console.log('start calling dll');
-	fun1('JavaScript',function (error,result) {
-		if (error) throw error;
-		console.log(result);
+	// console.log('start calling dll');
+	// fun1('JavaScript',function (error,result) {
+	// 	if (error) throw error;
+	// 	console.log(result);
 		
-	});
+	// });
 	
 	// helloWorld('JavaScript', function (error, result) {
     // if (error) throw error;

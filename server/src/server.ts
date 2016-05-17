@@ -67,10 +67,27 @@ connection.onDidChangeConfiguration((change) => {
 	documents.all().forEach(validateTextDocument);
 });
 
+var edge = require('electron-edge');
+	
+let fun1 = edge.func({
+	assemblyFile:'C:\\Src\\ClassLibrary1\\ClassLibrary1\\bin\\Debug\\ClassLibrary2.dll',
+	typeName:'ClassLibrary1.Class1',
+	methodName:'GetStringAsync'
+});
+
 function validateTextDocument(textDocument: ITextDocument): void {
 	let diagnostics: Diagnostic[] = [];
 	let lines = textDocument.getText().split(/\r?\n/g);
 	let problems = 0;
+
+	connection.console.log('start calling the dll');
+	let a = 'sss'
+	fun1('JavaScript',function (error,result) {
+		if (error) throw error;
+		console.log(result);
+		a = result;
+	});
+	
 	for (var i = 0; i < lines.length && problems < maxNumberOfProblems; i++) {
 		let line = lines[i];
 		let index = line.indexOf('typescript');
@@ -82,7 +99,7 @@ function validateTextDocument(textDocument: ITextDocument): void {
 					start: { line: i, character: index},
 					end: { line: i, character: index + 10 }
 				},
-				message: `${line.substr(index, 10)} should be spelled TypeScript`,
+				message: `${line.substr(index, 10)} should be spelled TypeScript` + a,
 				source: 'ex'
 			});
 		}
