@@ -62,17 +62,59 @@ export function activate(context: vscode.ExtensionContext) {
 	// use electron-edge to load dll
 	var edge = require('electron-edge');
 	
-	let fun1 = edge.func({
-		assemblyFile:'C:\\Src\\ClassLibrary1\\ClassLibrary1\\bin\\Debug\\ClassLibrary1.dll',
+	let fun_get_wrapper_symbol = edge.func({
+		assemblyFile:'/vagrant/symbol_manager_cosmosvs14/ScopeSymbolManagerWrapper.dll',
+		typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+		methodName:'GetSymbolListAsync'
+	});
+	
+	let fun_test_assembly_denpendency = edge.func({
+		assemblyFile:'/vagrant/Debug/ClassLibrary2.dll',
+		typeName:'ClassLibrary2.Class2',
+		methodName:'GetStringAsyncFromClass1'
+	});
+	
+	let fun_test_app_domain = edge.func({
+		assemblyFile:'/vagrant/ClassLibrary1.dll',
 		typeName:'ClassLibrary1.Class1',
 		methodName:'GetStringAsync'
 	});
 	
-	console.log('start calling dll');
-	fun1('JavaScript',function (error,result) {
-		if (error) throw error;
-		console.log(result);
-		
+	console.log('start calling ClassLibrary1 dll with app domain');
+	fun_test_app_domain('JavaScript',function (error,result) {
+		if (error) 
+		{
+			console.log('calling dll failed');
+			throw error;
+		}
+		else{
+		console.log(result);	
+		}
+	});
+	
+
+	console.log('start calling ClassLibrary2 dll');
+	fun_test_assembly_denpendency('JavaScript',function (error,result) {
+		if (error) 
+		{
+			console.log('calling dll failed');
+			throw error;
+		}
+		else{
+		console.log(result);	
+		}
+	});
+	
+	console.log('start calling ScopeSymbolManagerWrapper dll');
+	fun_get_wrapper_symbol('JavaScript',function (error,result) {
+		if (error) 
+		{
+			console.log('calling dll failed');
+			throw error;
+		}
+		else{
+		console.log(result);	
+		}
 	});
 	
 	// helloWorld('JavaScript', function (error, result) {
