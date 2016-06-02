@@ -35,7 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
 	// If the extension is launch in debug mode the debug server options are use
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { module: serverModule, transport: TransportKind.ipc },
+		run : { module: serverModule, transport: TransportKind.ipc},
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
 	
@@ -60,8 +60,9 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	
 	// use electron-edge to load dll
-	var edge = require('electron-edge');
+	 var edge = require('electron-edge');
 	
+
 	let fun_get_wrapper_symbol = edge.func({
 		assemblyFile:'/vagrant/symbol_manager_cosmosvs14/ScopeSymbolManagerWrapper.dll',
 		typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
@@ -116,6 +117,7 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(result);	
 		}
 	});
+
 	
 	// helloWorld('JavaScript', function (error, result) {
     // if (error) throw error;
