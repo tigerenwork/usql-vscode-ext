@@ -77,15 +77,85 @@ connection.onCompletion(function (textDocumentPosition) {
     // info and always provide the same completion items.
     return [
         {
-            label: 'TypeScript',
+            label: 'CREATE',
             kind: vscode_languageserver_1.CompletionItemKind.Text,
             data: 1
         },
         {
-            label: 'JavaScript',
+            label: 'DEPLOY',
             kind: vscode_languageserver_1.CompletionItemKind.Text,
             data: 2
-        }
+        },
+        {
+            label: 'DROP',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 3
+        },
+        {
+            label: 'EXECUTE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 4
+        },
+        {
+            label: 'INSERT',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 5
+        },
+        {
+            label: 'OUTPUT',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 6
+        },
+        {
+            label: 'REFERENCE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 7
+        },
+        {
+            label: 'RESOURCE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 8
+        },
+        {
+            label: 'SAMPLE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 9
+        },
+        {
+            label: 'TRUNCATE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 10
+        },
+        {
+            label: 'USE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 11
+        },
+        {
+            label: 'DECLARE',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 12
+        },
+        {
+            label: 'EXPORT',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 13
+        },
+        {
+            label: 'IF',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 14
+        },
+        {
+            label: 'SET',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 15
+        },
+        {
+            label: 'USING',
+            kind: vscode_languageserver_1.CompletionItemKind.Text,
+            data: 16
+        },
     ];
 });
 // This handler resolve additional information for the item selected in
