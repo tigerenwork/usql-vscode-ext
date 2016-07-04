@@ -57,6 +57,31 @@ export function activate(context: vscode.ExtensionContext) {
 	// Push the disposable to the context's subscriptions so that the 
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);
+
+	// 
+	var edge = require('electron-edge');
+	let fun_get_wrapper_symbol = edge.func({
+		assemblyFile:'c:\\Workspace\\vscode_linux\\ScopeSymbolManagerWrapper.dll',
+		typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+		methodName:'GetCompletionListAsync'
+	});
+		console.log('start calling ScopeSymbolManagerWrapper dll');
+		var payload = {
+			Path:'c:\\Workspace\\vscode_linux\\1.usql',
+			Source:'//Script GUID:213361ca-891f-44ab-956c-ab4f948ccb48',
+			Start:'0'
+		}
+
+	fun_get_wrapper_symbol(payload,function (error,result) {
+		if (error) 
+		{
+			console.log('calling dll failed');
+			throw error;
+		}
+		else{
+		console.log(result);	
+		}
+	});
 }
 
 // this method is called when your extension is deactivated
