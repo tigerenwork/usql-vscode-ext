@@ -131,14 +131,14 @@ connection.onDidOpenTextDocument((params) => {
 	// params.text the initial full content of the document.
 	connection.console.log(`${params.uri} opened.`);
 });
-
+*/
 connection.onDidChangeTextDocument((params) => {
 	// The content of a text document did change in VSCode.
 	// params.uri uniquely identifies the document.
 	// params.contentChanges describe the content changes to the document.
 	connection.console.log(`${params.uri} changed: ${JSON.stringify(params.contentChanges)}`);
 });
-
+/*
 connection.onDidCloseTextDocument((params) => {
 	// A text document got closed in VSCode.
 	// params.uri uniquely identifies the document.
