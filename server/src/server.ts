@@ -9,11 +9,15 @@ import {
 	createConnection, IConnection, TextDocumentSyncKind,
 	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentIdentifier,
-	CompletionItem, CompletionItemKind,TextDocumentPositionParams
+	CompletionItem, CompletionItemKind, TextDocumentPositionParams
 } from 'vscode-languageserver';
+
+import {util} from './features/util';
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
+
+let content: string;
 
 // Create a simple text document manager. The text document manager
 // supports full document sync only
@@ -90,7 +94,7 @@ function validateTextDocument(textDocument: TextDocument): void {
 			diagnostics.push({
 				severity: DiagnosticSeverity.Warning,
 				range: {
-					start: { line: i, character: index},
+					start: { line: i, character: index },
 					end: { line: i, character: index + 10 }
 				},
 				message: `${line.substr(index, 10)} should be spelled TypeScript`,
@@ -115,25 +119,50 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	// info and always provide the same completion items.
 
 	// For test only 
-	connection.console.log('start calling ScopeSymbolManagerWrapper dll');
+	connection.console.log('[Server] Start getting the assembly');
 	var edge = require('electron-edge');
-		let fun2 = edge.func({
-	assemblyFile:'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
-	typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
-	methodName:'GetCompletionList'
+	let fun2 = edge.func({
+		assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
+		typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+		methodName: 'GetCompletionListAsync'
 	});
-	console.log('starting calling the symbol manager')
-	fun2('JavaScript',function (error,result) {
+
+	connection.console.log('[Server] begin to get the file path');
+	var usqlScriptPath = util.ConvertUriToPath(textDocumentPosition.textDocument.uri);
+	connection.console.log(usqlScriptPath);
+
+	var startPoint = content.length;
+
+	var payload = {
+		Path: usqlScriptPath,
+		Source: content,
+		Start: (startPoint - 1).toString()
+	};
+
+
+
+
+	connection.console.log('[Server] Start getting completion list');
+	fun2(payload, function (error, result) {
 		if (error) {
-			connection.console.log('call symbol manager failed');
-			throw error;	
-		} 
-		else 
-		{
+			connection.console.log('[Server] call symbol manager failed');
+			throw error;
+		}
+		else {
 			connection.console.log(result);
+			var completionList: CompletionItem[] = [];
+			var i = 1;
+			result.forEach(element => {
+				completionList.push({
+					label: element.Text,
+					kind: CompletionItemKind.Text,
+					data: i
+				});
+				i = i + 1;
+			});
+			return completionList;
 		}
 	});
-	
 
 	return [
 		{
@@ -142,7 +171,7 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 			data: 1
 		},
 		{
-			label:'Good', 
+			label: 'Good',
 			kind: CompletionItemKind.Class,
 			data: 2
 		}
@@ -154,10 +183,10 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
 	if (item.data === 1) {
 		item.detail = 'TypeScript details',
-		item.documentation = 'TypeScript documentation'
+			item.documentation = 'TypeScript documentation'
 	} else if (item.data === 2) {
 		item.detail = 'JavaScript details',
-		item.documentation = 'JavaScript documentation'
+			item.documentation = 'JavaScript documentation'
 	}
 	return item;
 });
@@ -175,10 +204,10 @@ connection.onDidChangeTextDocument((params) => {
 	// params.uri uniquely identifies the document.
 	// params.contentChanges describe the content changes to the document.
 	//connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
-	
+
 	//connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
-	
-	
+	content = params.contentChanges[0].text;
+
 });
 /*
 connection.onDidCloseTextDocument((params) => {

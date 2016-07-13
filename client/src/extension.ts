@@ -6,6 +6,8 @@ import * as path from 'path';
 
 import { workspace, Disposable, ExtensionContext } from 'vscode';
 import { LanguageClient, LanguageClientOptions, SettingMonitor, ServerOptions, TransportKind } from 'vscode-languageclient';
+
+import {util} from './features/util'
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -25,20 +27,20 @@ export function activate(context: vscode.ExtensionContext) {
     // });
 
     // context.subscriptions.push(disposable);
-    
+
     //
-    	// The server is implemented in node
+	// The server is implemented in node
 	let serverModule = context.asAbsolutePath(path.join('server', 'server.js'));
 	// The debug options for the server
 	let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
-	
+
 	// If the extension is launch in debug mode the debug server options are use
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {
-		run : { module: serverModule, transport: TransportKind.ipc },
+		run: { module: serverModule, transport: TransportKind.ipc },
 		debug: { module: serverModule, transport: TransportKind.ipc, options: debugOptions }
 	}
-	
+
 	// Options to control the language client
 	let clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
@@ -50,14 +52,15 @@ export function activate(context: vscode.ExtensionContext) {
 			fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
 		}
 	}
-	
+
 	// Create the language client and start the client.
 	let disposable = new LanguageClient('Language Server Example', serverOptions, clientOptions).start();
-	
+
 	// Push the disposable to the context's subscriptions so that the 
 	// client can be deactivated on extension deactivation
 	context.subscriptions.push(disposable);
 
+	console.log(util.ConvertUriToPath('file:///e%3A/Share/USQLSampleApplication1/USQLSampleApplication1/SearchLog/SearchLog-1-First_U-SQL_Script.usql'))
 
 	// Create electron-edge 
 	/*var edge = require('electron-edge');
@@ -77,6 +80,28 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log(result);
 		}
 	});*/
+	/*		var payload = {
+			Path:'c:\\Workspace\\vscode_linux\\1.usql',
+			Source:'',
+			Start:'0'
+		};
+		var edge = require('electron-edge');
+			let fun2 = edge.func({
+		assemblyFile:'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
+		typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+		methodName:'GetCompletionListAsync'
+		});
+		console.log('starting calling the symbol manager')
+		fun2(payload,function (error,result) {
+			if (error) {
+				console.log('call symbol manager failed');
+				throw error;	
+			} 
+			else 
+			{
+				console.log(result);
+			}
+		});*/
 }
 
 // this method is called when your extension is deactivated

@@ -4,8 +4,10 @@
  * ------------------------------------------------------------------------------------------ */
 'use strict';
 var vscode_languageserver_1 = require('vscode-languageserver');
+var util_1 = require('./features/util');
 // Create a connection for the server. The connection uses Node's IPC as a transport
 var connection = vscode_languageserver_1.createConnection(new vscode_languageserver_1.IPCMessageReader(process), new vscode_languageserver_1.IPCMessageWriter(process));
+var content;
 // Create a simple text document manager. The text document manager
 // supports full document sync only
 var documents = new vscode_languageserver_1.TextDocuments();
@@ -85,21 +87,41 @@ connection.onCompletion(function (textDocumentPosition) {
     // which code complete got requested. For the example we ignore this
     // info and always provide the same completion items.
     // For test only 
-    connection.console.log('start calling ScopeSymbolManagerWrapper dll');
+    connection.console.log('[Server] Start getting the assembly');
     var edge = require('electron-edge');
     var fun2 = edge.func({
         assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
         typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
-        methodName: 'GetCompletionList'
+        methodName: 'GetCompletionListAsync'
     });
-    console.log('starting calling the symbol manager');
-    fun2('JavaScript', function (error, result) {
+    connection.console.log('[Server] begin to get the file path');
+    var usqlScriptPath = util_1.util.ConvertUriToPath(textDocumentPosition.textDocument.uri);
+    connection.console.log(usqlScriptPath);
+    var startPoint = content.length;
+    var payload = {
+        Path: usqlScriptPath,
+        Source: content,
+        Start: (startPoint - 1).toString()
+    };
+    connection.console.log('[Server] Start getting completion list');
+    fun2(payload, function (error, result) {
         if (error) {
-            connection.console.log('call symbol manager failed');
+            connection.console.log('[Server] call symbol manager failed');
             throw error;
         }
         else {
             connection.console.log(result);
+            var completionList = [];
+            var i = 1;
+            result.forEach(function (element) {
+                completionList.push({
+                    label: element.Text,
+                    kind: vscode_languageserver_1.CompletionItemKind.Text,
+                    data: i
+                });
+                i = i + 1;
+            });
+            return completionList;
         }
     });
     return [
@@ -142,6 +164,7 @@ connection.onDidChangeTextDocument(function (params) {
     // params.contentChanges describe the content changes to the document.
     //connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
     //connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
+    content = params.contentChanges[0].text;
 });
 /*
 connection.onDidCloseTextDocument((params) => {
