@@ -25,7 +25,11 @@ documents.listen(connection);
 // Create electron-edge 
 let edge = require('electron-edge');
 
-
+let get_completion_list = edge.fun({
+	assemblyFile:'c:\\Program Files (x86)\\Microsoft VS Code\\ScopeSymbolManagerWrapper.dll',
+	typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+	methodName:'GetSymbolListAsync'
+});
 
 
 // After the server has started the client sends an initilize request. The server receives
@@ -108,6 +112,20 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	// The pass parameter contains the position of the text document in 
 	// which code complete got requested. For the example we ignore this
 	// info and always provide the same completion items.
+
+	// For test only 
+
+	connection.console.log('start calling ScopeSymbolManagerWrapper dll');
+	get_completion_list('JavaScript',function (error,result) {
+		if (error) 
+		{
+			connection.console.log('calling dll failed');
+			throw error;
+		}
+		else{
+		console.log(result);	
+		}
+	});
 	return [
 		{
 			label: 'CREATE',
@@ -149,7 +167,7 @@ connection.onDidChangeTextDocument((params) => {
 	// params.contentChanges describe the content changes to the document.
 	//connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
 	
-	connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
+	//connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
 	
 	
 });

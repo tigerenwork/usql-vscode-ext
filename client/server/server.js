@@ -12,6 +12,13 @@ var documents = new vscode_languageserver_1.TextDocuments();
 // Make the text document manager listen on the connection
 // for open, change and close text document events
 documents.listen(connection);
+// Create electron-edge 
+var edge = require('electron-edge');
+var get_completion_list = edge.fun({
+    assemblyFile: 'c:\\Program Files (x86)\\Microsoft VS Code\\ScopeSymbolManagerWrapper.dll',
+    typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+    methodName: 'GetSymbolListAsync'
+});
 // After the server has started the client sends an initilize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilites. 
 var workspaceRoot;
@@ -75,6 +82,17 @@ connection.onCompletion(function (textDocumentPosition) {
     // The pass parameter contains the position of the text document in 
     // which code complete got requested. For the example we ignore this
     // info and always provide the same completion items.
+    // For test only 
+    connection.console.log('start calling ScopeSymbolManagerWrapper dll');
+    get_completion_list('JavaScript', function (error, result) {
+        if (error) {
+            connection.console.log('calling dll failed');
+            throw error;
+        }
+        else {
+            console.log(result);
+        }
+    });
     return [
         {
             label: 'CREATE',
@@ -114,8 +132,7 @@ connection.onDidChangeTextDocument(function (params) {
     // params.uri uniquely identifies the document.
     // params.contentChanges describe the content changes to the document.
     //connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
-    var uri = params.textDocument.uri;
-    connection.console.log(uri + " changed: " + JSON.stringify(params.contentChanges));
+    //connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
 });
 /*
 connection.onDidCloseTextDocument((params) => {
