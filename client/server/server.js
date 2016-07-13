@@ -80,6 +80,11 @@ connection.onCompletion(function (textDocumentPosition) {
             label: 'CREATE',
             kind: vscode_languageserver_1.CompletionItemKind.Text,
             data: 1
+        },
+        {
+            label: 'Good',
+            kind: vscode_languageserver_1.CompletionItemKind.Class,
+            data: 2
         }
     ];
 });
@@ -108,7 +113,9 @@ connection.onDidChangeTextDocument(function (params) {
     // The content of a text document did change in VSCode.
     // params.uri uniquely identifies the document.
     // params.contentChanges describe the content changes to the document.
-    connection.console.log(params.uri + " changed: " + JSON.stringify(params.contentChanges));
+    //connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
+    var uri = params.textDocument.uri;
+    connection.console.log(uri + " changed: " + JSON.stringify(params.contentChanges));
 });
 /*
 connection.onDidCloseTextDocument((params) => {
