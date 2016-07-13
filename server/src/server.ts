@@ -23,13 +23,14 @@ let documents: TextDocuments = new TextDocuments();
 documents.listen(connection);
 
 // Create electron-edge 
+/*
 let edge = require('electron-edge');
 
 let get_completion_list = edge.fun({
 	assemblyFile:'c:\\Program Files (x86)\\Microsoft VS Code\\ScopeSymbolManagerWrapper.dll',
 	typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
 	methodName:'GetSymbolListAsync'
-});
+});*/
 
 
 // After the server has started the client sends an initilize request. The server receives
@@ -114,18 +115,26 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	// info and always provide the same completion items.
 
 	// For test only 
-
 	connection.console.log('start calling ScopeSymbolManagerWrapper dll');
-	get_completion_list('JavaScript',function (error,result) {
-		if (error) 
+	var edge = require('electron-edge');
+		let fun2 = edge.func({
+	assemblyFile:'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
+	typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+	methodName:'GetCompletionList'
+	});
+	console.log('starting calling the symbol manager')
+	fun2('JavaScript',function (error,result) {
+		if (error) {
+			connection.console.log('call symbol manager failed');
+			throw error;	
+		} 
+		else 
 		{
-			connection.console.log('calling dll failed');
-			throw error;
-		}
-		else{
-		console.log(result);	
+			connection.console.log(result);
 		}
 	});
+	
+
 	return [
 		{
 			label: 'CREATE',

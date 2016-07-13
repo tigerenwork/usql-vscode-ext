@@ -60,24 +60,23 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	// Create electron-edge 
-let edge = require('electron-edge');
-
-let get_completion_list = edge.fun({
-	assemblyFile:'c:\\Program Files (x86)\\Microsoft VS Code\\ScopeSymbolManagerWrapper.dll',
+	/*var edge = require('electron-edge');
+		let fun2 = edge.func({
+	assemblyFile:'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
 	typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
 	methodName:'GetSymbolListAsync'
-});
-
-	get_completion_list('JavaScript',function (error,result) {
-		if (error) 
-		{
-			console.log('calling dll failed');
-			throw error;
-		}
-		else{
-		console.log(result);	
-		}
 	});
+	console.log('starting calling the symbol manager')
+	fun2('JavaScript',function (error,result) {
+		if (error) {
+			console.log('call symbol manager failed');
+			throw error;	
+		} 
+		else 
+		{
+			console.log(result);
+		}
+	});*/
 }
 
 // this method is called when your extension is deactivated

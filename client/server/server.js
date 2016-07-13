@@ -13,12 +13,14 @@ var documents = new vscode_languageserver_1.TextDocuments();
 // for open, change and close text document events
 documents.listen(connection);
 // Create electron-edge 
-var edge = require('electron-edge');
-var get_completion_list = edge.fun({
-    assemblyFile: 'c:\\Program Files (x86)\\Microsoft VS Code\\ScopeSymbolManagerWrapper.dll',
-    typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
-    methodName: 'GetSymbolListAsync'
-});
+/*
+let edge = require('electron-edge');
+
+let get_completion_list = edge.fun({
+    assemblyFile:'c:\\Program Files (x86)\\Microsoft VS Code\\ScopeSymbolManagerWrapper.dll',
+    typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+    methodName:'GetSymbolListAsync'
+});*/
 // After the server has started the client sends an initilize request. The server receives
 // in the passed params the rootPath of the workspace plus the client capabilites. 
 var workspaceRoot;
@@ -84,13 +86,20 @@ connection.onCompletion(function (textDocumentPosition) {
     // info and always provide the same completion items.
     // For test only 
     connection.console.log('start calling ScopeSymbolManagerWrapper dll');
-    get_completion_list('JavaScript', function (error, result) {
+    var edge = require('electron-edge');
+    var fun2 = edge.func({
+        assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
+        typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
+        methodName: 'GetCompletionList'
+    });
+    console.log('starting calling the symbol manager');
+    fun2('JavaScript', function (error, result) {
         if (error) {
-            connection.console.log('calling dll failed');
+            connection.console.log('call symbol manager failed');
             throw error;
         }
         else {
-            console.log(result);
+            connection.console.log(result);
         }
     });
     return [
