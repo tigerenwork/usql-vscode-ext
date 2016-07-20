@@ -13,6 +13,9 @@ import {
 } from 'vscode-languageserver';
 
 import {util} from './features/util';
+import {DocContent} from './features/doccontents';
+
+let docsChange: { [uri: string]: DocContent } = {};
 
 // Create a connection for the server. The connection uses Node's IPC as a transport
 let connection: IConnection = createConnection(new IPCMessageReader(process), new IPCMessageWriter(process));
@@ -106,6 +109,15 @@ function validateTextDocument(textDocument: TextDocument): void {
 	connection.sendDiagnostics({ uri: textDocument.uri, diagnostics });
 }
 
+function updateChangedText(textDocument: TextDocument): void {
+
+	docsChange[textDocument.uri] = new DocContent({
+		Position: 1,
+		Content: textDocument.getText()
+	});
+
+}
+
 connection.onDidChangeWatchedFiles((change) => {
 	// Monitored files have change in VSCode
 	connection.console.log('We recevied an file change event');
@@ -122,35 +134,41 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	connection.console.log('[Server] Start getting the assembly');
 	var edge = require('electron-edge');
 	let fun2 = edge.func({
-		assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
+		//assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
+		assemblyFile:'d:\\temp\\symbol_manager_cosmosvs14\\ScopeSymbolManagerWrapper.dll',
 		typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
 		methodName: 'GetCompletionListAsync'
 	});
-
 	connection.console.log('[Server] begin to get the file path');
 	var usqlScriptPath = util.ConvertUriToPath(textDocumentPosition.textDocument.uri);
 	connection.console.log(usqlScriptPath);
 
-	var startPoint = content.length;
+	var content = docsChange[textDocumentPosition.textDocument.uri];
+	var textDocument = documents.get(textDocumentPosition.textDocument.uri);
+	textDocument.offsetAt(textDocumentPosition.position)
 
+	// var payload = {
+	// 	Path: usqlScriptPath,
+	// 	Source: content.Content,
+	// 	Start: (textDocument.offsetAt(textDocumentPosition.position)-1).toString()
+	// };
 	var payload = {
-		Path: usqlScriptPath,
-		Source: content,
-		Start: (startPoint - 1).toString()
+		Path: 'c:\\Workspace\\vscode_linux\\1.usql',
+		Source: '',
+		Start: '0'
 	};
-
-
-
-
+	var completionList: CompletionItem[] = [];
 	connection.console.log('[Server] Start getting completion list');
 	fun2(payload, function (error, result) {
 		if (error) {
 			connection.console.log('[Server] call symbol manager failed');
+			connection.console.log(error);
+			
 			throw error;
 		}
 		else {
 			connection.console.log(result);
-			var completionList: CompletionItem[] = [];
+
 			var i = 1;
 			result.forEach(element => {
 				completionList.push({
@@ -163,31 +181,22 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 			return completionList;
 		}
 	});
-
-	return [
-		{
-			label: 'CREATE',
-			kind: CompletionItemKind.Text,
-			data: 1
-		},
-		{
-			label: 'Good',
-			kind: CompletionItemKind.Class,
-			data: 2
-		}
-	]
+	return completionList;
 });
 
 // This handler resolve additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
-	if (item.data === 1) {
-		item.detail = 'TypeScript details',
-			item.documentation = 'TypeScript documentation'
-	} else if (item.data === 2) {
-		item.detail = 'JavaScript details',
-			item.documentation = 'JavaScript documentation'
-	}
+	// if (item.data === 1) {
+	// 	item.detail = 'TypeScript details',
+	// 		item.documentation = 'TypeScript documentation'
+	// } else if (item.data === 2) {
+	// 	item.detail = 'JavaScript details',
+	// 		item.documentation = 'JavaScript documentation'
+	// }
+
+	item.detail = item.label;
+	item.documentation = item.label
 	return item;
 });
 
@@ -206,7 +215,12 @@ connection.onDidChangeTextDocument((params) => {
 	//connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
 
 	//connection.console.log(`${params.textDocument.uri} changed: ${JSON.stringify(params.contentChanges)}`);
-	content = params.contentChanges[0].text;
+
+	docsChange[params.textDocument.uri] = new DocContent({
+		Position: 1,
+		Content: params.contentChanges[0].text,
+		TextDocument: null
+	});
 
 });
 /*
