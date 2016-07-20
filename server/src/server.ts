@@ -163,12 +163,10 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 		if (error) {
 			connection.console.log('[Server] call symbol manager failed');
 			connection.console.log(error);
-			
 			throw error;
 		}
 		else {
 			connection.console.log(result);
-
 			var i = 1;
 			result.forEach(element => {
 				completionList.push({
@@ -187,14 +185,6 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 // This handler resolve additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => {
-	// if (item.data === 1) {
-	// 	item.detail = 'TypeScript details',
-	// 		item.documentation = 'TypeScript documentation'
-	// } else if (item.data === 2) {
-	// 	item.detail = 'JavaScript details',
-	// 		item.documentation = 'JavaScript documentation'
-	// }
-
 	item.detail = item.label;
 	item.documentation = item.label
 	return item;
