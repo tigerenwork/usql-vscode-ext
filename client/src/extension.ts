@@ -34,6 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
 	// The debug options for the server
 	let debugOptions = { execArgv: ["--nolazy", "--debug=6004"] };
 
+	console.log(serverModule);
+
 	// If the extension is launch in debug mode the debug server options are use
 	// Otherwise the run options are used
 	let serverOptions: ServerOptions = {

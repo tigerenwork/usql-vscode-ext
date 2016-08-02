@@ -8,9 +8,7 @@
 		"node": "*"
 	},
 	"dependencies": {
-		"vscode-languageserver": "^2.2.0",
-		"edge":"^5.0.0",
-		"electron-edge": "^5.0.3-pre1"
+		"vscode-languageserver": "^2.2.0"
 	},
 	"devDependencies": {
 		"typescript": "^1.8.9"

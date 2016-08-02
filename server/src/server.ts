@@ -9,9 +9,8 @@ import {
 	createConnection, IConnection, TextDocumentSyncKind,
 	TextDocuments, TextDocument, Diagnostic, DiagnosticSeverity,
 	InitializeParams, InitializeResult, TextDocumentIdentifier,
-	CompletionItem, CompletionItemKind, TextDocumentPositionParams
+	CompletionItem, CompletionItemKind, TextDocumentPositionParams, Position
 } from 'vscode-languageserver';
-
 import {util} from './features/util';
 import {DocContent} from './features/doccontents';
 
@@ -38,6 +37,7 @@ let get_completion_list = edge.fun({
 	typeName:'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
 	methodName:'GetSymbolListAsync'
 });*/
+
 
 
 // After the server has started the client sends an initilize request. The server receives
@@ -118,6 +118,16 @@ function updateChangedText(textDocument: TextDocument): void {
 
 }
 
+function getPositionOffset(content: string, position: Position): number {
+	let lines = content.split(/\r?\n/g);
+	var currentPositionOffset = 0;
+	for (var i = 0; i < position.line; i++) {
+		currentPositionOffset += lines[i].length;
+	}
+	currentPositionOffset += position.character;
+	return currentPositionOffset - 1;
+}
+
 connection.onDidChangeWatchedFiles((change) => {
 	// Monitored files have change in VSCode
 	connection.console.log('We recevied an file change event');
@@ -133,30 +143,32 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 	// For test only 
 	connection.console.log('[Server] Start getting the assembly');
 	var edge = require('electron-edge');
+	// var assemblyFilePath = 'c:\\Users\\tigeren\\.vscode\\extensions\\Microsoft.usql-vscode-ext-0.0.1\\scopecompiler\\ScopeSymbolManagerWrapper.dll';
+	// var assemblyFilePath = 'd:\\Temp\\symbol_manager_cosmosvs14\\ScopeSymbolManagerWrapper.dll';
+	var assemblyFilePath = 'd:\\Src\\usql-vscode-ext\\client\\scopecompiler\\ScopeSymbolManagerWrapper.dll';
 	let fun2 = edge.func({
-		//assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
-		assemblyFile:'d:\\temp\\symbol_manager_cosmosvs14\\ScopeSymbolManagerWrapper.dll',
+		assemblyFile: assemblyFilePath,
 		typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
 		methodName: 'GetCompletionListAsync'
 	});
 	connection.console.log('[Server] begin to get the file path');
+
 	var usqlScriptPath = util.ConvertUriToPath(textDocumentPosition.textDocument.uri);
 	connection.console.log(usqlScriptPath);
 
 	var content = docsChange[textDocumentPosition.textDocument.uri];
 	var textDocument = documents.get(textDocumentPosition.textDocument.uri);
-	textDocument.offsetAt(textDocumentPosition.position)
-
-	// var payload = {
-	// 	Path: usqlScriptPath,
-	// 	Source: content.Content,
-	// 	Start: (textDocument.offsetAt(textDocumentPosition.position)-1).toString()
-	// };
+	var offsetPosition = textDocument.offsetAt(textDocumentPosition.position)
+	connection.console.log(offsetPosition.toString());
 	var payload = {
-		Path: 'c:\\Workspace\\vscode_linux\\1.usql',
-		Source: '',
-		Start: '0'
+		Path: usqlScriptPath,
+		Source: content.Content,
+		Start: getPositionOffset(content.Content, textDocumentPosition.position).toString()
 	};
+	connection.console.log('[Server] payload:');
+	connection.console.log(payload.Path);
+	connection.console.log(payload.Start);
+
 	var completionList: CompletionItem[] = [];
 	connection.console.log('[Server] Start getting completion list');
 	fun2(payload, function (error, result) {
@@ -168,14 +180,17 @@ connection.onCompletion((textDocumentPosition: TextDocumentPositionParams): Comp
 		else {
 			connection.console.log(result);
 			var i = 1;
-			result.forEach(element => {
-				completionList.push({
-					label: element.Text,
-					kind: CompletionItemKind.Text,
-					data: i
+			if (result != null) {
+				result.forEach(element => {
+					completionList.push({
+						label: element.Text,
+						kind: CompletionItemKind.Text,
+						data: i
+					});
+					i = i + 1;
 				});
-				i = i + 1;
-			});
+			}
+
 			return completionList;
 		}
 	});

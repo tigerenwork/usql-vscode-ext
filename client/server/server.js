@@ -85,6 +85,15 @@ function updateChangedText(textDocument) {
         Content: textDocument.getText()
     });
 }
+function getPositionOffset(content, position) {
+    var lines = content.split(/\r?\n/g);
+    var currentPositionOffset = 0;
+    for (var i = 0; i < position.line; i++) {
+        currentPositionOffset += lines[i].length;
+    }
+    currentPositionOffset += position.character;
+    return currentPositionOffset - 1;
+}
 connection.onDidChangeWatchedFiles(function (change) {
     // Monitored files have change in VSCode
     connection.console.log('We recevied an file change event');
@@ -97,9 +106,11 @@ connection.onCompletion(function (textDocumentPosition) {
     // For test only 
     connection.console.log('[Server] Start getting the assembly');
     var edge = require('electron-edge');
+    // var assemblyFilePath = 'c:\\Users\\tigeren\\.vscode\\extensions\\Microsoft.usql-vscode-ext-0.0.1\\scopecompiler\\ScopeSymbolManagerWrapper.dll';
+    // var assemblyFilePath = 'd:\\Temp\\symbol_manager_cosmosvs14\\ScopeSymbolManagerWrapper.dll';
+    var assemblyFilePath = 'd:\\Src\\usql-vscode-ext\\client\\scopecompiler\\ScopeSymbolManagerWrapper.dll';
     var fun2 = edge.func({
-        //assemblyFile: 'D:\\Src\\ScopeSymbolManagerWrapper\\WrapperUT\\bin\\Debug\\ScopeSymbolManagerWrapper.dll',
-        assemblyFile: 'd:\\temp\\symbol_manager_cosmosvs14\\ScopeSymbolManagerWrapper.dll',
+        assemblyFile: assemblyFilePath,
         typeName: 'ScopeSymbolManagerWrapper.SymbolManagerWrapper',
         methodName: 'GetCompletionListAsync'
     });
@@ -108,17 +119,16 @@ connection.onCompletion(function (textDocumentPosition) {
     connection.console.log(usqlScriptPath);
     var content = docsChange[textDocumentPosition.textDocument.uri];
     var textDocument = documents.get(textDocumentPosition.textDocument.uri);
-    textDocument.offsetAt(textDocumentPosition.position);
-    // var payload = {
-    // 	Path: usqlScriptPath,
-    // 	Source: content.Content,
-    // 	Start: (textDocument.offsetAt(textDocumentPosition.position)-1).toString()
-    // };
+    var offsetPosition = textDocument.offsetAt(textDocumentPosition.position);
+    connection.console.log(offsetPosition.toString());
     var payload = {
-        Path: 'c:\\Workspace\\vscode_linux\\1.usql',
-        Source: '',
-        Start: '0'
+        Path: usqlScriptPath,
+        Source: content.Content,
+        Start: getPositionOffset(content.Content, textDocumentPosition.position).toString()
     };
+    connection.console.log('[Server] payload:');
+    connection.console.log(payload.Path);
+    connection.console.log(payload.Start);
     var completionList = [];
     connection.console.log('[Server] Start getting completion list');
     fun2(payload, function (error, result) {
@@ -130,14 +140,16 @@ connection.onCompletion(function (textDocumentPosition) {
         else {
             connection.console.log(result);
             var i = 1;
-            result.forEach(function (element) {
-                completionList.push({
-                    label: element.Text,
-                    kind: vscode_languageserver_1.CompletionItemKind.Text,
-                    data: i
+            if (result != null) {
+                result.forEach(function (element) {
+                    completionList.push({
+                        label: element.Text,
+                        kind: vscode_languageserver_1.CompletionItemKind.Text,
+                        data: i
+                    });
+                    i = i + 1;
                 });
-                i = i + 1;
-            });
+            }
             return completionList;
         }
     });
@@ -146,13 +158,6 @@ connection.onCompletion(function (textDocumentPosition) {
 // This handler resolve additional information for the item selected in
 // the completion list.
 connection.onCompletionResolve(function (item) {
-    // if (item.data === 1) {
-    // 	item.detail = 'TypeScript details',
-    // 		item.documentation = 'TypeScript documentation'
-    // } else if (item.data === 2) {
-    // 	item.detail = 'JavaScript details',
-    // 		item.documentation = 'JavaScript documentation'
-    // }
     item.detail = item.label;
     item.documentation = item.label;
     return item;
